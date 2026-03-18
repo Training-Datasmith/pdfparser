@@ -96,10 +96,13 @@ class Element
         return (string) $this->value;
     }
 
-    public static function parse(string $content, ?Document $document = null, int &$position = 0)
+    /**
+     * @return mixed[]
+     */
+    public static function parse(string $content, ?Document $document = null, int &$position = 0): array
     {
         $args = \func_get_args();
-        $only_values = isset($args[3]) ? $args[3] : false;
+        $only_values = $args[3] ?? false;
         $content = trim($content);
         $values = [];
 
@@ -112,7 +115,7 @@ class Element
                 } else {
                     $name = preg_replace_callback(
                         '/#([0-9a-f]{2})/i',
-                        function ($m) {
+                        function ($m): string {
                             return \chr(base_convert($m[1], 16, 10));
                         },
                         ltrim($match['name'], '/')

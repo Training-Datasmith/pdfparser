@@ -62,7 +62,7 @@ class Header
         $this->document = $document;
     }
 
-    public function init()
+    public function init(): void
     {
         foreach ($this->elements as $element) {
             if ($element instanceof Element) {
@@ -180,7 +180,7 @@ class Header
             $header = new self([], $document);
 
             if ($elements) {
-                $header = new self($elements->getRawContent(), null);
+                $header = new self($elements->getRawContent());
             }
         }
 

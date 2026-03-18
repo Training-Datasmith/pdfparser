@@ -41,11 +41,6 @@ use Smalot\PdfParser\Font;
  */
 class ElementString extends Element
 {
-    public function __construct($value)
-    {
-        parent::__construct($value, null);
-    }
-
     public function equals($value): bool
     {
         return $value == $this->value;

@@ -74,7 +74,7 @@ class ElementDate extends ElementString
         parent::__construct($value);
     }
 
-    public function setFormat(string $format)
+    public function setFormat(string $format): void
     {
         $this->format = $format;
     }
@@ -92,7 +92,7 @@ class ElementDate extends ElementString
 
     public function __toString(): string
     {
-        return (string) $this->value->format($this->format);
+        return $this->value->format($this->format);
     }
 
     /**

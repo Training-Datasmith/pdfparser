@@ -52,7 +52,7 @@ class ElementHexa extends ElementString
             $element = ElementDate::parse($name, $document);
 
             if (!$element) {
-                $element = ElementString::parse($name, $document);
+                return ElementString::parse($name, $document);
             }
 
             return $element;
@@ -84,8 +84,6 @@ class ElementHexa extends ElementString
             }
         }
 
-        $text = html_entity_decode($text, \ENT_NOQUOTES, 'UTF-8');
-
-        return $text;
+        return html_entity_decode($text, \ENT_NOQUOTES, 'UTF-8');
     }
 }

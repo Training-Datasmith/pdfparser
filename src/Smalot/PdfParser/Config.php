@@ -94,7 +94,7 @@ class Config
         return $this->fontSpaceLimit;
     }
 
-    public function setFontSpaceLimit($value)
+    public function setFontSpaceLimit($value): void
     {
         $this->fontSpaceLimit = $value;
     }

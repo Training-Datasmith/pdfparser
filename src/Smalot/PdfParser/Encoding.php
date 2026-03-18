@@ -57,7 +57,7 @@ class Encoding extends PDFObject
      */
     protected $mapping;
 
-    public function init()
+    public function init(): void
     {
         $this->mapping = [];
         $this->differences = [];
@@ -106,9 +106,7 @@ class Encoding extends PDFObject
         $details['BaseEncoding'] = ($this->has('BaseEncoding') ? (string) $this->get('BaseEncoding') : 'Ansi');
         $details['Differences'] = ($this->has('Differences') ? (string) $this->get('Differences') : '');
 
-        $details += parent::getDetails($deep);
-
-        return $details;
+        return $details + parent::getDetails($deep);
     }
 
     public function translateChar($dec): ?int

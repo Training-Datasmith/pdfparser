@@ -42,7 +42,7 @@ class ElementNumeric extends Element
 {
     public function __construct(string $value)
     {
-        parent::__construct((float) $value, null);
+        parent::__construct((float) $value);
     }
 
     /**

@@ -72,7 +72,7 @@ class Font extends PDFObject
      */
     private $initializedEncodingByPdfObject;
 
-    public function init()
+    public function init(): void
     {
         // Load translate table.
         $this->loadTranslateTable();
@@ -96,9 +96,7 @@ class Font extends PDFObject
         $details['Type'] = $this->getType();
         $details['Encoding'] = ($this->has('Encoding') ? (string) $this->get('Encoding') : 'Ansi');
 
-        $details += parent::getDetails($deep);
-
-        return $details;
+        return $details + parent::getDetails($deep);
     }
 
     /**
@@ -243,7 +241,10 @@ class Font extends PDFObject
                             // Support for : <srcCode1> <srcCodeN> [<dstString1> <dstString2> ... <dstStringN>]
                             $strings = [];
                             $matched = preg_match_all('/<(?P<string>[0-9A-F]+)> */is', $dest, $strings);
-                            if (false === $matched || 0 === $matched) {
+                            if (false === $matched) {
+                                continue;
+                            }
+                            if (0 === $matched) {
                                 continue;
                             }
 
@@ -276,10 +277,8 @@ class Font extends PDFObject
      * Set custom char translation table where:
      * - key - integer character code;
      * - value - "utf-8" encoded value;
-     *
-     * @return void
      */
-    public function setTable(array $table)
+    public function setTable(array $table): void
     {
         $this->table = $table;
     }
@@ -369,7 +368,7 @@ class Font extends PDFObject
 
         // Now we can replace all octal codes without worrying about
         // escaped backslashes
-        $text = preg_replace_callback('/\\\\([0-7]{1,3})/', function ($m) {
+        $text = preg_replace_callback('/\\\\([0-7]{1,3})/', function ($m): string {
             return \chr(octdec($m[1]));
         }, $text);
 
@@ -385,7 +384,7 @@ class Font extends PDFObject
      */
     public static function decodeEntities(string $text): string
     {
-        return preg_replace_callback('/#([0-9a-f]{2})/i', function ($m) {
+        return preg_replace_callback('/#([0-9a-f]{2})/i', function ($m): string {
             return \chr(hexdec($m[1]));
         }, $text);
     }
@@ -484,13 +483,12 @@ class Font extends PDFObject
         // text includes extra spaces on either side. If so, merge
         // where appropriate.
         $words = implode("\x00\x00", $words);
-        $words = str_replace(
+
+        return str_replace(
             [" \x00\x00 ", "\x00\x00 ", " \x00\x00", "\x00\x00"],
             ['  ', ' ', ' ', ' '],
             $words
         );
-
-        return $words;
     }
 
     /**
@@ -503,7 +501,7 @@ class Font extends PDFObject
         // If this string begins with a UTF-16BE BOM, then decode it
         // directly as Unicode
         if ("\xFE\xFF" === substr($text, 0, 2)) {
-            return $this->decodeUnicode($text);
+            return static::decodeUnicode($text);
         }
 
         if ($this->has('ToUnicode')) {
@@ -552,12 +550,14 @@ class Font extends PDFObject
                     $decoded = false;
 
                     foreach ($fonts as $font) {
-                        if ($font instanceof self) {
-                            if (false !== ($decoded = $font->translateChar($char, false))) {
-                                $decoded = mb_convert_encoding($decoded, 'UTF-8', 'Windows-1252');
-                                break;
-                            }
+                        if (!$font instanceof self) {
+                            continue;
                         }
+                        if (false === $decoded = $font->translateChar($char, false)) {
+                            continue;
+                        }
+                        $decoded = mb_convert_encoding($decoded, 'UTF-8', 'Windows-1252');
+                        break;
                     }
 
                     if (false !== $decoded) {
@@ -673,7 +673,7 @@ class Font extends PDFObject
      *
      * @return string|false
      */
-    private function decodeContentByAutodetectIfNecessary(string $text)
+    private function decodeContentByAutodetectIfNecessary(string $text): string
     {
         if (mb_check_encoding($text, 'UTF-8')) {
             return $text;

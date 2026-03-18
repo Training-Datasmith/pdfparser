@@ -45,7 +45,7 @@ class ElementBoolean extends Element
      */
     public function __construct($value)
     {
-        parent::__construct('true' == strtolower($value) || true === $value, null);
+        parent::__construct('true' == strtolower($value) || true === $value);
     }
 
     public function __toString(): string

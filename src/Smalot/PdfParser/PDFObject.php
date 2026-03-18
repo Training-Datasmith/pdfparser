@@ -271,7 +271,7 @@ class PDFObject
             // are almost certain to be inside a (string)
             if (0 < $paraClose && (false === $paraOpen || $paraClose < $paraOpen)) {
                 // Bump the search offset forward and match again
-                $offsetBI = (int) $text[1][1];
+                $offsetBI = $text[1][1];
                 continue;
             }
 
@@ -299,7 +299,7 @@ class PDFObject
                 // weren't specified, then we don't know what this is, so
                 // just leave it alone; bump the search offset forward and
                 // match again
-                $offsetBI = (int) $text[1][1];
+                $offsetBI = $text[1][1];
             }
         }
 
@@ -411,9 +411,7 @@ class PDFObject
             );
         }
 
-        $content = trim(preg_replace(['/(\r\n){2,}/', '/\r\n +/'], "\r\n", $content));
-
-        return $content;
+        return trim(preg_replace(['/(\r\n){2,}/', '/\r\n +/'], "\r\n", $content));
     }
 
     /**
@@ -813,10 +811,19 @@ class PDFObject
                         // Marked content point with (DP) & without (MP) property list
                     case 'DP':
                     case 'MP':
-                        break;
 
                         // End text object
                     case 'ET':
+                    // set character spacing
+                    case 'Tc':
+                    // set text rendering mode
+                    case 'Ts':
+                    // set super/subscripting text rise
+                    case 'Ts':
+                    // set word spacing
+                    case 'Tw':
+                    // set horizontal scaling
+                    case 'Tz':
                         break;
 
                         // Store current selected font and graphics matrix
@@ -827,7 +834,7 @@ class PDFObject
 
                         // Restore previous selected font and graphics matrix
                     case 'Q':
-                        list($current_font, $current_font_size) = array_pop($clipped_font);
+                        [$current_font, $current_font_size] = array_pop($clipped_font);
                         $current_position_cm = array_pop($clipped_position_cm);
                         break;
 
@@ -986,10 +993,6 @@ class PDFObject
                         $current_position_td['y'] += $current_text_leading;
                         break;
 
-                        // set character spacing
-                    case 'Tc':
-                        break;
-
                         // move text current point and set leading
                     case 'Td':
                     case 'TD':
@@ -1042,30 +1045,12 @@ class PDFObject
                         ];
                         break;
 
-                        // set text rendering mode
-                    case 'Ts':
-                        break;
-
-                        // set super/subscripting text rise
-                    case 'Ts':
-                        break;
-
-                        // set word spacing
-                    case 'Tw':
-                        break;
-
-                        // set horizontal scaling
-                    case 'Tz':
-                        break;
-
                     default:
                 }
             }
         }
 
-        $result = array_merge($result, $text);
-
-        return $result;
+        return array_merge($result, $text);
     }
 
     /**

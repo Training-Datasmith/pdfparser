@@ -42,7 +42,7 @@ class ElementNull extends Element
 {
     public function __construct()
     {
-        parent::__construct(null, null);
+        parent::__construct(null);
     }
 
     public function __toString(): string

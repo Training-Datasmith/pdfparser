@@ -41,7 +41,7 @@ class ElementMissing extends Element
 {
     public function __construct()
     {
-        parent::__construct(null, null);
+        parent::__construct(null);
     }
 
     public function equals($value): bool

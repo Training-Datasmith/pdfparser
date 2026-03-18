@@ -42,11 +42,6 @@ use Smalot\PdfParser\PDFObject;
  */
 class ElementArray extends Element
 {
-    public function __construct($value, ?Document $document = null)
-    {
-        parent::__construct($value, $document);
-    }
-
     public function getContent()
     {
         foreach ($this->value as $name => $element) {

@@ -100,7 +100,7 @@ class Parser
     public function parseContent(string $content): Document
     {
         // Create structure from raw data.
-        list($xref, $data) = $this->rawDataParser->parseData($content);
+        [$xref, $data] = $this->rawDataParser->parseData($content);
 
         if (isset($xref['trailer']['encrypt']) && false === $this->config->getIgnoreEncryption()) {
             throw new \Exception('Secured pdf file are currently not supported.');
@@ -125,7 +125,7 @@ class Parser
         return $document;
     }
 
-    protected function parseTrailer(array $structure, ?Document $document)
+    protected function parseTrailer(array $structure, ?Document $document): \Smalot\PdfParser\Header
     {
         $trailer = [];
 
@@ -136,7 +136,7 @@ class Parser
                 $trailer[$name] = new ElementNumeric($values);
             } elseif (\is_array($values)) {
                 $value = $this->parseTrailer($values, null);
-                $trailer[$name] = new ElementArray($value, null);
+                $trailer[$name] = new ElementArray($value);
             } elseif (false !== strpos($values, '_')) {
                 $trailer[$name] = new ElementXRef($values, $document);
             } else {
@@ -174,15 +174,12 @@ class Parser
                     break;
 
                 case 'stream':
-                    $content = isset($part[3][0]) ? $part[3][0] : $part[1];
-
+                    $content = $part[3][0] ?? $part[1];
                     if ($header->get('Type')->equals('ObjStm')) {
                         $match = [];
-
                         // Split xrefs and contents.
                         preg_match('/^((\d+\s+\d+\s*)*)(.*)$/s', $content, $match);
                         $content = $match[3];
-
                         // Extract xrefs.
                         $xrefs = preg_split(
                             '/(\d+\s+\d+\s*)/s',
@@ -191,31 +188,27 @@ class Parser
                             \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE
                         );
                         $table = [];
-
                         foreach ($xrefs as $xref) {
-                            list($id, $position) = preg_split("/\s+/", trim($xref));
+                            [$id, $position] = preg_split("/\s+/", trim($xref));
                             $table[$position] = $id;
                         }
-
                         ksort($table);
-
                         $ids = array_values($table);
                         $positions = array_keys($table);
-
                         foreach ($positions as $index => $position) {
                             $id = $ids[$index].'_0';
-                            $next_position = isset($positions[$index + 1]) ? $positions[$index + 1] : \strlen($content);
+                            $next_position = $positions[$index + 1] ?? \strlen($content);
                             $sub_content = substr($content, $position, (int) $next_position - (int) $position);
 
                             $sub_header = Header::parse($sub_content, $document);
                             $object = PDFObject::factory($document, $sub_header, '', $this->config);
                             $this->objects[$id] = $object;
                         }
-
                         // It is not necessary to store this content.
-
                         return;
-                    } elseif ($header->get('Type')->equals('Metadata')) {
+                    }
+
+                    if ($header->get('Type')->equals('Metadata')) {
                         // Attempt to parse XMP XML Metadata
                         $document->extractXMPMetadata($content);
                     }

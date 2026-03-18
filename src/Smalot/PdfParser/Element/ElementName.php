@@ -43,7 +43,7 @@ class ElementName extends Element
 {
     public function __construct(string $value)
     {
-        parent::__construct($value, null);
+        parent::__construct($value);
     }
 
     public function equals($value): bool

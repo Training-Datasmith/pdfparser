@@ -79,7 +79,7 @@ class Document
         $this->trailer = new Header([], $this);
     }
 
-    public function init()
+    public function init(): void
     {
         $this->buildDictionary();
 
@@ -223,11 +223,13 @@ class Document
             foreach ($values as $val) {
                 // Standardize to lowercase
                 $val['tag'] = strtolower($val['tag']);
-
                 // Ignore structural x: and rdf: XML elements
                 if (0 === strpos($val['tag'], 'x:')) {
                     continue;
-                } elseif (0 === strpos($val['tag'], 'rdf:') && 'rdf:li' != $val['tag']) {
+                }
+
+                // Ignore structural x: and rdf: XML elements
+                if (0 === strpos($val['tag'], 'rdf:') && 'rdf:li' != $val['tag']) {
                     continue;
                 }
 
@@ -319,7 +321,7 @@ class Document
     /**
      * @param PDFObject[] $objects
      */
-    public function setObjects($objects = [])
+    public function setObjects($objects = []): void
     {
         $this->objects = (array) $objects;
 
@@ -339,11 +341,7 @@ class Document
      */
     public function getObjectById(string $id)
     {
-        if (isset($this->objects[$id])) {
-            return $this->objects[$id];
-        }
-
-        return null;
+        return $this->objects[$id] ?? null;
     }
 
     public function hasObjectsByType(string $type, ?string $subtype = null): bool
@@ -371,7 +369,7 @@ class Document
     /**
      * @return Font[]
      */
-    public function getFonts()
+    public function getFonts(): array
     {
         return $this->getObjectsByType('Font');
     }
@@ -438,7 +436,7 @@ class Document
             $pages = \array_slice($pages, 0, $pageLimit);
         }
 
-        foreach ($pages as $index => $page) {
+        foreach ($pages as $page) {
             /**
              * In some cases, the $page variable may be null.
              */
@@ -458,7 +456,7 @@ class Document
         return $this->trailer;
     }
 
-    public function setTrailer(Header $trailer)
+    public function setTrailer(Header $trailer): void
     {
         $this->trailer = $trailer;
     }

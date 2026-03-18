@@ -459,7 +459,7 @@ class RawDataParser
             } else {
                 $obj_num = 0;
             }
-            foreach ($sdata as $k => $row) {
+            foreach ($sdata as $row) {
                 switch ($row[0]) {
                     case 0:  // (f) linked list of free objects
                         break;
@@ -504,7 +504,7 @@ class RawDataParser
         } // end decoding data
         if (isset($prevxref)) {
             // get previous xref
-            $xref = $this->getXrefData($pdfData, $prevxref, $xref, $visitedOffsets);
+            return $this->getXrefData($pdfData, $prevxref, $xref, $visitedOffsets);
         }
 
         return $xref;
@@ -600,19 +600,20 @@ class RawDataParser
      *
      * @throws \Exception
      */
-    protected function getObjectVal(string $pdfData, $xref, array $obj): array
+    protected function getObjectVal(string $pdfData, array $xref, array $obj): array
     {
-        if ('objref' == $obj[0]) {
-            // reference to indirect object
-            if (isset($this->objects[$obj[1]])) {
-                // this object has been already parsed
-                return $this->objects[$obj[1]];
-            } elseif (isset($xref[$obj[1]])) {
-                // parse new object
-                $this->objects[$obj[1]] = $this->getIndirectObject($pdfData, $xref, $obj[1], $xref[$obj[1]], false);
-
-                return $this->objects[$obj[1]];
-            }
+        if ('objref' != $obj[0]) {
+            return $obj;
+        }
+        // reference to indirect object
+        if (isset($this->objects[$obj[1]])) {
+            // this object has been already parsed
+            return $this->objects[$obj[1]];
+        }
+        if (isset($xref[$obj[1]])) {
+            // parse new object
+            $this->objects[$obj[1]] = $this->getIndirectObject($pdfData, $xref, $obj[1], $xref[$obj[1]], false);
+            return $this->objects[$obj[1]];
         }
 
         return $obj;
@@ -900,11 +901,12 @@ class RawDataParser
             \PREG_SET_ORDER,
             $offset
         );
-
         if (0 == $startxrefPreg) {
             // No startxref tables were found
             throw new \Exception('Unable to find startxref');
-        } elseif (0 == $offset) {
+        }
+
+        if (0 == $offset) {
             // Use the last startxref in the document
             $startxref = (int) $startxrefMatches[\count($startxrefMatches) - 1][1];
         } elseif (strpos($pdfData, 'xref', $bumpOffset) == $bumpOffset) {
@@ -913,7 +915,8 @@ class RawDataParser
         } elseif (preg_match('/([0-9]+[\s][0-9]+[\s]obj)/i', $pdfData, $matches, 0, $bumpOffset)) {
             // Cross-Reference Stream object
             $startxref = $bumpOffset;
-        } else {
+        }
+        else {
             // Use the next startxref from this $offset
             $startxref = (int) $startxrefMatches[0][1];
         }
