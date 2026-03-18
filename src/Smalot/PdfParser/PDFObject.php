@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -814,15 +816,15 @@ class PDFObject
 
                         // End text object
                     case 'ET':
-                    // set character spacing
+                        // set character spacing
                     case 'Tc':
-                    // set text rendering mode
+                        // set text rendering mode
                     case 'Ts':
-                    // set super/subscripting text rise
+                        // set super/subscripting text rise
                     case 'Ts':
-                    // set word spacing
+                        // set word spacing
                     case 'Tw':
-                    // set horizontal scaling
+                        // set horizontal scaling
                     case 'Tz':
                         break;
 

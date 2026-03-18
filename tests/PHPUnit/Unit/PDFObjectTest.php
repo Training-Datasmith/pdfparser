@@ -44,7 +44,7 @@ class PDFObjectTest extends TestCase
             'Resources' => new Header([
                 'XObject' => new Header([
                     'Im0' => $image,
-                ])
+                ]),
             ]),
             'Contents' => new ElementArray([new Element('/Im0 Do', $document)], $document),
         ]);
@@ -54,7 +54,7 @@ class PDFObjectTest extends TestCase
             'Resources' => new Header([
                 'XObject' => new Header([
                     'Fr0' => $formNoText,
-                ])
+                ]),
             ]),
             'Contents' => new ElementArray([new Element('/Fr0 Do', $document)], $document),
         ]);
@@ -64,7 +64,7 @@ class PDFObjectTest extends TestCase
             'Resources' => new Header([
                 'XObject' => new Header([
                     'Fr0' => $formWithText,
-                ])
+                ]),
             ]),
             'Contents' => new ElementArray([new Element('/Fr0 Do', $document)], $document),
         ]);
@@ -74,7 +74,7 @@ class PDFObjectTest extends TestCase
             'Resources' => new Header([
                 'XObject' => new Header([
                     'Ps0' => $xObject,
-                ])
+                ]),
             ]),
             'Contents' => new ElementArray([new Element('/Ps0 Do', $document)], $document),
         ]);

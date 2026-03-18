@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is based on code of tecnickcom/TCPDF PDF library.
  *

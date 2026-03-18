@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is based on code of tecnickcom/TCPDF PDF library.
  *
@@ -915,8 +917,7 @@ class RawDataParser
         } elseif (preg_match('/([0-9]+[\s][0-9]+[\s]obj)/i', $pdfData, $matches, 0, $bumpOffset)) {
             // Cross-Reference Stream object
             $startxref = $bumpOffset;
-        }
-        else {
+        } else {
             // Use the next startxref from this $offset
             $startxref = (int) $startxrefMatches[0][1];
         }

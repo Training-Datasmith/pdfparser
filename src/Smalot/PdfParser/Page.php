@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -811,18 +813,18 @@ class Page extends PDFObject
                      * Show a Text String
                      */
                 case 'Tj':
-                /*
-                 * array TJ
-                 * Show one or more text strings allow individual glyph positioning.
-                 * Each lement of array con be a string or a number. If the element is
-                 * a string, this operator shows the string. If it is a number, the
-                 * operator adjust the text position by that amount; that is, it translates
-                 * the text matrix, Tm. This amount is substracted form the current
-                 * horizontal or vertical coordinate, depending on the writing mode.
-                 * in the default coordinate system, a positive adjustment has the effect
-                 * of moving the next glyph painted either to the left or down by the given
-                 * amount.
-                 */
+                    /*
+                     * array TJ
+                     * Show one or more text strings allow individual glyph positioning.
+                     * Each lement of array con be a string or a number. If the element is
+                     * a string, this operator shows the string. If it is a number, the
+                     * operator adjust the text position by that amount; that is, it translates
+                     * the text matrix, Tm. This amount is substracted form the current
+                     * horizontal or vertical coordinate, depending on the writing mode.
+                     * in the default coordinate system, a positive adjustment has the effect
+                     * of moving the next glyph painted either to the left or down by the given
+                     * amount.
+                     */
                 case 'TJ':
                     $data = [$Tm, $currentText];
                     if ($this->config->getDataTmFontInfoHasToBeIncluded()) {
