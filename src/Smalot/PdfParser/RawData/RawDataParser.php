@@ -869,7 +869,7 @@ class RawDataParser
      *
      * @param int        $offset        xref offset (if known)
      * @param array      $xref          previous xref array (if any)
-     * @param array<int> $visitedOffsets array of visited offsets to prevent infinite loops
+     * @param array<int,true> $visitedOffsets hash-set of visited offsets (keys) to prevent infinite loops; O(1) lookup
      *
      * @return array containing xref and trailer data
      *
@@ -878,14 +878,15 @@ class RawDataParser
      */
     protected function getXrefData(string $pdfData, int $offset = 0, array $xref = [], array $visitedOffsets = []): array
     {
-        // Check for circular references to prevent infinite loops
-        if (\in_array($offset, $visitedOffsets, true)) {
+        // Use the array as a hash-set (keys) for O(1) membership tests instead of
+        // in_array() which is O(n), avoiding O(n²) traversal on PDFs with many xref sections.
+        if (isset($visitedOffsets[$offset])) {
             // We've already processed this offset, skip to avoid infinite loop
             return $xref;
         }
 
-        // Track this offset as visited
-        $visitedOffsets[] = $offset;
+        // Track this offset as visited (key-based for O(1) lookup)
+        $visitedOffsets[$offset] = true;
         // If the $offset is currently pointed at whitespace, bump it
         // forward until it isn't; affects loosely targetted offsets
         // for the 'xref' keyword
