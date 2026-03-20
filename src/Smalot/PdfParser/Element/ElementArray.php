@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,74 +30,63 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-use Smalot\PdfParser\Header;
-use Smalot\PdfParser\PDFObject;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
+use Smalot\Pdf_Parser\Header;
+use Smalot\Pdf_Parser\Pdf_Object;
 /**
  * Class ElementArray
  */
-class ElementArray extends Element
+class Element_Array extends Element
 {
-    public function getContent()
+    public function get_content()
     {
         foreach ($this->value as $name => $element) {
-            $this->resolveXRef($name);
+            $this->resolve_x_ref($name);
         }
-
-        return parent::getContent();
+        return parent::get_content();
     }
-
-    public function getRawContent(): array
+    public function get_raw_content(): array
     {
         return $this->value;
     }
-
-    public function getDetails(bool $deep = true): array
+    public function get_details(bool $deep = true): array
     {
         $values = [];
-        $elements = $this->getContent();
-
+        $elements = $this->get_content();
         foreach ($elements as $key => $element) {
             if ($element instanceof Header && $deep) {
-                $values[$key] = $element->getDetails($deep);
-            } elseif ($element instanceof PDFObject && $deep) {
-                $values[$key] = $element->getDetails(false);
+                $values[$key] = $element->get_details($deep);
+            } elseif ($element instanceof Pdf_Object && $deep) {
+                $values[$key] = $element->get_details(false);
             } elseif ($element instanceof self) {
                 if ($deep) {
-                    $values[$key] = $element->getDetails();
+                    $values[$key] = $element->get_details();
                 }
-            } elseif ($element instanceof Element && !($element instanceof self)) {
-                $values[$key] = $element->getContent();
+            } elseif ($element instanceof Element && !$element instanceof self) {
+                $values[$key] = $element->get_content();
             }
         }
-
         return $values;
     }
-
     public function __toString(): string
     {
         return implode(',', $this->value);
     }
-
     /**
      * @return Element|PDFObject
      */
-    protected function resolveXRef(string $name)
+    protected function resolve_x_ref(string $name)
     {
-        if (($obj = $this->value[$name]) instanceof ElementXRef) {
+        if (($obj = $this->value[$name]) instanceof Element_X_Ref) {
             /** @var ElementXRef $obj */
-            $obj = $this->document->getObjectById($obj->getId());
+            $obj = $this->document->get_object_by_id($obj->get_id());
             $this->value[$name] = $obj;
         }
-
         return $this->value[$name];
     }
-
     /**
      * @todo: These methods return mixed and mismatched types throughout the hierarchy
      *
@@ -108,29 +96,24 @@ class ElementArray extends Element
     {
         if (preg_match('/^\s*\[(?P<array>.*)/is', $content, $match)) {
             preg_match_all('/(.*?)(\[|\])/s', trim($content), $matches);
-
             $level = 0;
             $sub = '';
             foreach ($matches[0] as $part) {
                 $sub .= $part;
-                $level += (false !== strpos($part, '[') ? 1 : -1);
+                $level += false !== strpos($part, '[') ? 1 : -1;
                 if ($level <= 0) {
                     break;
                 }
             }
-
             // Removes 1 level [ and ].
             $sub = substr(trim($sub), 1, -1);
             $sub_offset = 0;
             $values = Element::parse($sub, $document, $sub_offset, true);
-
             $offset += strpos($content, '[') + 1;
             // Find next ']' position
             $offset += \strlen($sub) + 1;
-
             return new self($values, $document);
         }
-
         return false;
     }
 }

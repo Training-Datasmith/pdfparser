@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,22 +30,19 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
 /**
  * Class ElementNumeric
  */
-class ElementNumeric extends Element
+class Element_Numeric extends Element
 {
     public function __construct(string $value)
     {
         parent::__construct((float) $value);
     }
-
     /**
      * @return bool|ElementNumeric
      */
@@ -55,10 +51,8 @@ class ElementNumeric extends Element
         if (preg_match('/^\s*(?P<value>\-?[0-9\.]+)/s', $content, $match)) {
             $value = $match['value'];
             $offset += strpos($content, $value) + \strlen($value);
-
             return new self($value);
         }
-
         return false;
     }
 }

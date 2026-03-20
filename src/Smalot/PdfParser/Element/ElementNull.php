@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,32 +30,27 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
 /**
  * Class ElementNull
  */
-class ElementNull extends Element
+class Element_Null extends Element
 {
     public function __construct()
     {
         parent::__construct(null);
     }
-
     public function __toString(): string
     {
         return 'null';
     }
-
     public function equals($value): bool
     {
-        return $this->getContent() === $value;
+        return $this->get_content() === $value;
     }
-
     /**
      * @return bool|ElementNull
      */
@@ -64,10 +58,8 @@ class ElementNull extends Element
     {
         if (preg_match('/^\s*(null)/s', $content, $match)) {
             $offset += strpos($content, 'null') + \strlen('null');
-
             return new self();
         }
-
         return false;
     }
 }

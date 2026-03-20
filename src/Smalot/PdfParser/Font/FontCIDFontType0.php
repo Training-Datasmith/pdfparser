@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,14 +30,12 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Font;
 
-namespace Smalot\PdfParser\Font;
-
-use Smalot\PdfParser\Font;
-
+use Smalot\Pdf_Parser\Font;
 /**
  * Class FontCIDFontType0
  */
-class FontCIDFontType0 extends Font
+class Font_Cid_Font_Type0 extends Font
 {
 }

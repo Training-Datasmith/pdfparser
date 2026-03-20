@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * This file is based on code of tecnickcom/TCPDF PDF library.
  *
@@ -41,15 +40,12 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Raw_Data;
 
-namespace Smalot\PdfParser\RawData;
-
-use Smalot\PdfParser\Exception\NotImplementedException;
-
-class FilterHelper
+use Smalot\Pdf_Parser\Exception\Not_Implemented_Exception;
+class Filter_Helper
 {
-    protected $availableFilters = ['ASCIIHexDecode', 'ASCII85Decode', 'LZWDecode', 'FlateDecode', 'RunLengthDecode'];
-
+    protected $available_filters = ['ASCIIHexDecode', 'ASCII85Decode', 'LZWDecode', 'FlateDecode', 'RunLengthDecode'];
     /**
      * Decode data using the specified filter type.
      *
@@ -61,39 +57,33 @@ class FilterHelper
      * @throws \Exception
      * @throws \Smalot\PdfParser\Exception\NotImplementedException if a certain decode function is not implemented yet
      */
-    public function decodeFilter(string $filter, string $data, int $decodeMemoryLimit = 0): string
+    public function decode_filter(string $filter, string $data, int $decode_memory_limit = 0): string
     {
         switch ($filter) {
             case 'ASCIIHexDecode':
-                return $this->decodeFilterASCIIHexDecode($data);
-
+                return $this->decode_filter_ascii_hex_decode($data);
             case 'ASCII85Decode':
-                return $this->decodeFilterASCII85Decode($data);
-
+                return $this->decode_filter_ascii85decode($data);
             case 'LZWDecode':
-                return $this->decodeFilterLZWDecode($data);
-
+                return $this->decode_filter_lzw_decode($data);
             case 'FlateDecode':
-                return $this->decodeFilterFlateDecode($data, $decodeMemoryLimit);
-
+                return $this->decode_filter_flate_decode($data, $decode_memory_limit);
             case 'RunLengthDecode':
-                return $this->decodeFilterRunLengthDecode($data);
-
+                return $this->decode_filter_run_length_decode($data);
             case 'CCITTFaxDecode':
-                throw new NotImplementedException('Decode CCITTFaxDecode not implemented yet.');
+                throw new Not_Implemented_Exception('Decode CCITTFaxDecode not implemented yet.');
             case 'JBIG2Decode':
-                throw new NotImplementedException('Decode JBIG2Decode not implemented yet.');
+                throw new Not_Implemented_Exception('Decode JBIG2Decode not implemented yet.');
             case 'DCTDecode':
-                throw new NotImplementedException('Decode DCTDecode not implemented yet.');
+                throw new Not_Implemented_Exception('Decode DCTDecode not implemented yet.');
             case 'JPXDecode':
-                throw new NotImplementedException('Decode JPXDecode not implemented yet.');
+                throw new Not_Implemented_Exception('Decode JPXDecode not implemented yet.');
             case 'Crypt':
-                throw new NotImplementedException('Decode Crypt not implemented yet.');
+                throw new Not_Implemented_Exception('Decode Crypt not implemented yet.');
             default:
                 return $data;
         }
     }
-
     /**
      * ASCIIHexDecode
      *
@@ -105,7 +95,7 @@ class FilterHelper
      *
      * @throws \Exception
      */
-    protected function decodeFilterASCIIHexDecode(string $data): string
+    protected function decode_filter_ascii_hex_decode(string $data): string
     {
         // all white-space characters shall be ignored
         $data = preg_replace('/[\s]/', '', $data);
@@ -118,11 +108,11 @@ class FilterHelper
         }
         // get data length
         $data_length = \strlen($data);
-        if (0 != ($data_length % 2)) {
+        if (0 != $data_length % 2) {
             // odd number of hexadecimal digits
             if ($eod) {
                 // EOD shall behave as if a 0 (zero) followed the last digit
-                $data = substr($data, 0, -1).'0'.substr($data, -1);
+                $data = substr($data, 0, -1) . '0' . substr($data, -1);
             } else {
                 throw new \Exception('decodeFilterASCIIHexDecode: invalid code');
             }
@@ -133,10 +123,8 @@ class FilterHelper
         }
         // get one byte of binary data for each pair of ASCII hexadecimal digits
         $decoded = pack('H*', $data);
-
         return $decoded;
     }
-
     /**
      * ASCII85Decode
      *
@@ -148,7 +136,7 @@ class FilterHelper
      *
      * @throws \Exception
      */
-    protected function decodeFilterASCII85Decode(string $data): string
+    protected function decode_filter_ascii85decode(string $data): string
     {
         // initialize string to return
         $decoded = '';
@@ -172,17 +160,17 @@ class FilterHelper
             throw new \Exception('decodeFilterASCII85Decode: invalid code');
         }
         // z sequence
-        $zseq = \chr(0).\chr(0).\chr(0).\chr(0);
+        $zseq = \chr(0) . \chr(0) . \chr(0) . \chr(0);
         // position inside a group of 4 bytes (0-3)
         $group_pos = 0;
         $tuple = 0;
         $pow85 = [85 * 85 * 85 * 85, 85 * 85 * 85, 85 * 85, 85, 1];
-
         // for each byte
         for ($i = 0; $i < $data_length; ++$i) {
             // get char value
             $char = \ord($data[$i]);
-            if (122 == $char) { // 'z'
+            if (122 == $char) {
+                // 'z'
                 if (0 == $group_pos) {
                     $decoded .= $zseq;
                 } else {
@@ -190,7 +178,7 @@ class FilterHelper
                 }
             } else {
                 // the value represented by a group of 5 characters should never be greater than 2^32 - 1
-                $tuple += (($char - 33) * $pow85[$group_pos]);
+                $tuple += ($char - 33) * $pow85[$group_pos];
                 if (4 == $group_pos) {
                     // The following if-clauses are an attempt to fix/suppress the following deprecation warning:
                     //      chr(): Providing a value not in-between 0 and 255 is deprecated, this is because a byte value
@@ -201,26 +189,22 @@ class FilterHelper
                     } else {
                         $chr8Part = \chr($tuple >> 8);
                     }
-
                     if (255 < $tuple >> 16) {
                         $chr16Part = \chr(($tuple >> 16) % 256);
                     } else {
                         $chr16Part = \chr($tuple >> 16);
                     }
-
                     if (255 < $tuple >> 24) {
                         $chr24Part = \chr(($tuple >> 24) % 256);
                     } else {
                         $chr24Part = \chr($tuple >> 24);
                     }
-
                     if (255 < $tuple) {
-                        $chrTuple = \chr($tuple % 256);
+                        $chr_tuple = \chr($tuple % 256);
                     } else {
-                        $chrTuple = \chr($tuple);
+                        $chr_tuple = \chr($tuple);
                     }
-
-                    $decoded .= $chr24Part . $chr16Part . $chr8Part . $chrTuple;
+                    $decoded .= $chr24Part . $chr16Part . $chr8Part . $chr_tuple;
                     $tuple = 0;
                     $group_pos = 0;
                 } else {
@@ -234,24 +218,19 @@ class FilterHelper
         // last tuple (if any)
         switch ($group_pos) {
             case 4:
-                $decoded .= \chr($tuple >> 24).\chr($tuple >> 16).\chr($tuple >> 8);
+                $decoded .= \chr($tuple >> 24) . \chr($tuple >> 16) . \chr($tuple >> 8);
                 break;
-
             case 3:
-                $decoded .= \chr($tuple >> 24).\chr($tuple >> 16);
+                $decoded .= \chr($tuple >> 24) . \chr($tuple >> 16);
                 break;
-
             case 2:
                 $decoded .= \chr($tuple >> 24);
                 break;
-
             case 1:
                 throw new \Exception('decodeFilterASCII85Decode: invalid code');
         }
-
         return $decoded;
     }
-
     /**
      * FlateDecode
      *
@@ -264,13 +243,12 @@ class FilterHelper
      *
      * @throws \Exception
      */
-    protected function decodeFilterFlateDecode(string $data, int $decodeMemoryLimit): ?string
+    protected function decode_filter_flate_decode(string $data, int $decode_memory_limit): ?string
     {
         // Uncatchable E_WARNING for "data error" is @ suppressed
         // so execution may proceed with an alternate decompression
         // method.
-        $decoded = @gzuncompress($data, $decodeMemoryLimit);
-
+        $decoded = @gzuncompress($data, $decode_memory_limit);
         if (false === $decoded) {
             // If gzuncompress() failed, try again using the compress.zlib://
             // wrapper to decode it in a file-based context.
@@ -278,25 +256,22 @@ class FilterHelper
             // Issue: https://github.com/smalot/pdfparser/issues/592
             $ztmp = tmpfile();
             if (false != $ztmp) {
-                fwrite($ztmp, "\x1f\x8b\x08\x00\x00\x00\x00\x00".$data);
+                fwrite($ztmp, "\x1f\x8b\x08\x00\x00\x00\x00\x00" . $data);
                 $file = stream_get_meta_data($ztmp)['uri'];
-                if (0 === $decodeMemoryLimit) {
-                    $decoded = file_get_contents('compress.zlib://'.$file);
+                if (0 === $decode_memory_limit) {
+                    $decoded = file_get_contents('compress.zlib://' . $file);
                 } else {
-                    $decoded = file_get_contents('compress.zlib://'.$file, false, null, 0, $decodeMemoryLimit);
+                    $decoded = file_get_contents('compress.zlib://' . $file, false, null, 0, $decode_memory_limit);
                 }
                 fclose($ztmp);
             }
         }
-
         if (false === \is_string($decoded) || '' === $decoded) {
             // If the decoded string is empty, that means decoding failed.
             throw new \Exception('decodeFilterFlateDecode: invalid data');
         }
-
         return $decoded;
     }
-
     /**
      * LZWDecode
      *
@@ -306,7 +281,7 @@ class FilterHelper
      *
      * @return string Data string
      */
-    protected function decodeFilterLZWDecode(string $data): string
+    protected function decode_filter_lzw_decode(string $data): string
     {
         // initialize string to return
         $decoded = '';
@@ -331,12 +306,13 @@ class FilterHelper
         // previous val
         $prev_index = 0;
         // while we encounter EOD marker (257), read code_length bits
-        while (($data_length > 0) && (257 != ($index = bindec(substr($bitstring, 0, $bitlen))))) {
+        while ($data_length > 0 && 257 != $index = bindec(substr($bitstring, 0, $bitlen))) {
             // remove read bits from string
             $bitstring = substr($bitstring, $bitlen);
             // update number of bits
             $data_length -= $bitlen;
-            if (256 == $index) { // clear-table marker
+            if (256 == $index) {
+                // clear-table marker
                 // reset code length in bits
                 $bitlen = 9;
                 // reset dictionary index
@@ -356,12 +332,12 @@ class FilterHelper
                 if ($index < $dix) {
                     // index exist on dictionary
                     $decoded .= $dictionary[$index];
-                    $dic_val = $dictionary[$prev_index].$dictionary[$index][0];
+                    $dic_val = $dictionary[$prev_index] . $dictionary[$index][0];
                     // store current index
                     $prev_index = $index;
                 } else {
                     // index do not exist on dictionary
-                    $dic_val = $dictionary[$prev_index].$dictionary[$prev_index][0];
+                    $dic_val = $dictionary[$prev_index] . $dictionary[$prev_index][0];
                     $decoded .= $dic_val;
                 }
                 // update dictionary
@@ -377,10 +353,8 @@ class FilterHelper
                 }
             }
         }
-
         return $decoded;
     }
-
     /**
      * RunLengthDecode
      *
@@ -388,7 +362,7 @@ class FilterHelper
      *
      * @param string $data Data to decode
      */
-    protected function decodeFilterRunLengthDecode(string $data): string
+    protected function decode_filter_run_length_decode(string $data): string
     {
         // initialize string to return
         $decoded = '';
@@ -406,7 +380,7 @@ class FilterHelper
                 // the following length + 1 (1 to 128) bytes shall be copied literally during decompression
                 $decoded .= substr($data, $i + 1, $byte + 1);
                 // move to next block
-                $i += ($byte + 2);
+                $i += $byte + 2;
             } else {
                 // if length is in the range 129 to 255,
                 // the following single byte shall be copied 257 - length (2 to 128) times during decompression
@@ -415,15 +389,13 @@ class FilterHelper
                 $i += 2;
             }
         }
-
         return $decoded;
     }
-
     /**
      * @return array list of available filters
      */
-    public function getAvailableFilters(): array
+    public function get_available_filters(): array
     {
-        return $this->availableFilters;
+        return $this->available_filters;
     }
 }

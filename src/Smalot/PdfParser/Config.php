@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,8 +30,7 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
-
-namespace Smalot\PdfParser;
+namespace Smalot\Pdf_Parser;
 
 /**
  * This class contains configurations used in various classes. You can override them
@@ -42,136 +40,113 @@ namespace Smalot\PdfParser;
  */
 class Config
 {
-    private $fontSpaceLimit = -50;
-
+    private $font_space_limit = -50;
     /**
      * @var string
      */
-    private $horizontalOffset = ' ';
-
+    private $horizontal_offset = ' ';
     /**
      * Represents: (NUL, HT, LF, FF, CR, SP)
      *
      * @var string
      */
-    private $pdfWhitespaces = "\0\t\n\f\r ";
-
+    private $pdf_whitespaces = "\x00\t\n\f\r ";
     /**
      * Represents: (NUL, HT, LF, FF, CR, SP)
      *
      * @var string
      */
-    private $pdfWhitespacesRegex = '[\0\t\n\f\r ]';
-
+    private $pdf_whitespaces_regex = '[\0\t\n\f\r ]';
     /**
      * Whether to retain raw image data as content or discard it to save memory
      *
      * @var bool
      */
-    private $retainImageContent = true;
-
+    private $retain_image_content = true;
     /**
      * Memory limit to use when de-compressing files, in bytes.
      *
      * @var int
      */
-    private $decodeMemoryLimit = 0;
-
+    private $decode_memory_limit = 0;
     /**
      * Whether to include font id and size in dataTm array
      *
      * @var bool
      */
-    private $dataTmFontInfoHasToBeIncluded = false;
-
+    private $data_tm_font_info_has_to_be_included = false;
     /**
      * Whether to attempt to read PDFs even if they are marked as encrypted.
      *
      * @var bool
      */
-    private $ignoreEncryption = false;
-
-    public function getFontSpaceLimit()
+    private $ignore_encryption = false;
+    public function get_font_space_limit()
     {
-        return $this->fontSpaceLimit;
+        return $this->font_space_limit;
     }
-
-    public function setFontSpaceLimit($value): void
+    public function set_font_space_limit($value): void
     {
-        $this->fontSpaceLimit = $value;
+        $this->font_space_limit = $value;
     }
-
-    public function getHorizontalOffset(): string
+    public function get_horizontal_offset(): string
     {
-        return $this->horizontalOffset;
+        return $this->horizontal_offset;
     }
-
-    public function setHorizontalOffset($value): void
+    public function set_horizontal_offset($value): void
     {
-        $this->horizontalOffset = $value;
+        $this->horizontal_offset = $value;
     }
-
-    public function getPdfWhitespaces(): string
+    public function get_pdf_whitespaces(): string
     {
-        return $this->pdfWhitespaces;
+        return $this->pdf_whitespaces;
     }
-
-    public function setPdfWhitespaces(string $pdfWhitespaces): void
+    public function set_pdf_whitespaces(string $pdf_whitespaces): void
     {
-        $this->pdfWhitespaces = $pdfWhitespaces;
+        $this->pdf_whitespaces = $pdf_whitespaces;
     }
-
-    public function getPdfWhitespacesRegex(): string
+    public function get_pdf_whitespaces_regex(): string
     {
-        return $this->pdfWhitespacesRegex;
+        return $this->pdf_whitespaces_regex;
     }
-
-    public function setPdfWhitespacesRegex(string $pdfWhitespacesRegex): void
+    public function set_pdf_whitespaces_regex(string $pdf_whitespaces_regex): void
     {
-        $this->pdfWhitespacesRegex = $pdfWhitespacesRegex;
+        $this->pdf_whitespaces_regex = $pdf_whitespaces_regex;
     }
-
-    public function getRetainImageContent(): bool
+    public function get_retain_image_content(): bool
     {
-        return $this->retainImageContent;
+        return $this->retain_image_content;
     }
-
-    public function setRetainImageContent(bool $retainImageContent): void
+    public function set_retain_image_content(bool $retain_image_content): void
     {
-        $this->retainImageContent = $retainImageContent;
+        $this->retain_image_content = $retain_image_content;
     }
-
-    public function getDecodeMemoryLimit(): int
+    public function get_decode_memory_limit(): int
     {
-        return $this->decodeMemoryLimit;
+        return $this->decode_memory_limit;
     }
-
-    public function setDecodeMemoryLimit(int $decodeMemoryLimit): void
+    public function set_decode_memory_limit(int $decode_memory_limit): void
     {
-        $this->decodeMemoryLimit = $decodeMemoryLimit;
+        $this->decode_memory_limit = $decode_memory_limit;
     }
-
-    public function getDataTmFontInfoHasToBeIncluded(): bool
+    public function get_data_tm_font_info_has_to_be_included(): bool
     {
-        return $this->dataTmFontInfoHasToBeIncluded;
+        return $this->data_tm_font_info_has_to_be_included;
     }
-
-    public function setDataTmFontInfoHasToBeIncluded(bool $dataTmFontInfoHasToBeIncluded): void
+    public function set_data_tm_font_info_has_to_be_included(bool $data_tm_font_info_has_to_be_included): void
     {
-        $this->dataTmFontInfoHasToBeIncluded = $dataTmFontInfoHasToBeIncluded;
+        $this->data_tm_font_info_has_to_be_included = $data_tm_font_info_has_to_be_included;
     }
-
-    public function getIgnoreEncryption(): bool
+    public function get_ignore_encryption(): bool
     {
-        return $this->ignoreEncryption;
+        return $this->ignore_encryption;
     }
-
     /**
      * @deprecated this is a temporary workaround, don't rely on it
      * @see https://github.com/smalot/pdfparser/pull/653
      */
-    public function setIgnoreEncryption(bool $ignoreEncryption): void
+    public function set_ignore_encryption(bool $ignore_encryption): void
     {
-        $this->ignoreEncryption = $ignoreEncryption;
+        $this->ignore_encryption = $ignore_encryption;
     }
 }

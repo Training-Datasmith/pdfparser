@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,27 +30,23 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
 /**
  * Class ElementXRef
  */
-class ElementXRef extends Element
+class Element_X_Ref extends Element
 {
-    public function getId(): string
+    public function get_id(): string
     {
-        return $this->getContent();
+        return $this->get_content();
     }
-
-    public function getObject()
+    public function get_object()
     {
-        return $this->document->getObjectById($this->getId());
+        return $this->document->get_object_by_id($this->get_id());
     }
-
     public function equals($value): bool
     {
         /**
@@ -64,24 +59,16 @@ class ElementXRef extends Element
          *
          * would fail (= 5_0 and 5 are not equal in PHP 8.0+).
          */
-        if (
-            true === is_numeric($value)
-            && true === \is_string($this->getContent())
-            && 1 === preg_match('/[0-9]+\_[0-9]+/', $this->getContent(), $matches)
-        ) {
-            return (float) $this->getContent() == $value;
+        if (true === is_numeric($value) && true === \is_string($this->get_content()) && 1 === preg_match('/[0-9]+\_[0-9]+/', $this->get_content(), $matches)) {
+            return (float) $this->get_content() == $value;
         }
-
-        $id = ($value instanceof self) ? $value->getId() : $value;
-
-        return $this->getId() == $id;
+        $id = $value instanceof self ? $value->get_id() : $value;
+        return $this->get_id() == $id;
     }
-
     public function __toString(): string
     {
-        return '#Obj#'.$this->getId();
+        return '#Obj#' . $this->get_id();
     }
-
     /**
      * @return bool|ElementXRef
      */
@@ -91,10 +78,8 @@ class ElementXRef extends Element
             $id = $match['id'];
             $offset += strpos($content, $id) + \strlen($id);
             $id = str_replace(' ', '_', rtrim($id, ' R'));
-
             return new self($id, $document);
         }
-
         return false;
     }
 }

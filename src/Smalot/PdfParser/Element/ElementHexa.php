@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,15 +30,13 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-
+use Smalot\Pdf_Parser\Document;
 /**
  * Class ElementHexa
  */
-class ElementHexa extends ElementString
+class Element_Hexa extends Element_String
 {
     /**
      * @return bool|ElementHexa|ElementDate
@@ -48,35 +45,30 @@ class ElementHexa extends ElementString
     {
         if (preg_match('/^\s*\<(?P<name>[A-F0-9]+)\>/is', $content, $match)) {
             $name = $match['name'];
-            $offset += strpos($content, '<'.$name) + \strlen($name) + 2; // 1 for '>'
+            $offset += strpos($content, '<' . $name) + \strlen($name) + 2;
+            // 1 for '>'
             // repackage string as standard
-            $name = '('.self::decode($name).')';
-            $element = ElementDate::parse($name, $document);
-
+            $name = '(' . self::decode($name) . ')';
+            $element = Element_Date::parse($name, $document);
             if (!$element) {
-                return ElementString::parse($name, $document);
+                return Element_String::parse($name, $document);
             }
-
             return $element;
         }
-
         return false;
     }
-
     public static function decode(string $value): string
     {
         $text = '';
-
         // Filter $value of non-hexadecimal characters
         $value = (string) preg_replace('/[^0-9a-f]/i', '', $value);
-
         // Check for leading zeros (4-byte hexadecimal indicator), or
         // the BE BOM
         if ('00' === substr($value, 0, 2) || 'feff' === strtolower(substr($value, 0, 4))) {
             $value = (string) preg_replace('/^feff/i', '', $value);
             for ($i = 0, $length = \strlen($value); $i < $length; $i += 4) {
                 $hex = substr($value, $i, 4);
-                $text .= '&#'.str_pad(hexdec($hex), 4, '0', \STR_PAD_LEFT).';';
+                $text .= '&#' . str_pad(hexdec($hex), 4, '0', \STR_PAD_LEFT) . ';';
             }
         } else {
             // Otherwise decode this as 2-byte hexadecimal
@@ -85,7 +77,6 @@ class ElementHexa extends ElementString
                 $text .= \chr(hexdec($hex));
             }
         }
-
         return html_entity_decode($text, \ENT_NOQUOTES, 'UTF-8');
     }
 }

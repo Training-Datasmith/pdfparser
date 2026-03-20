@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,17 +30,15 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-use Smalot\PdfParser\Header;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
+use Smalot\Pdf_Parser\Header;
 /**
  * Class ElementStruct
  */
-class ElementStruct extends Element
+class Element_Struct extends Element
 {
     /**
      * @return false|Header
@@ -50,28 +47,22 @@ class ElementStruct extends Element
     {
         if (preg_match('/^\s*<<(?P<struct>.*)/is', $content)) {
             preg_match_all('/(.*?)(<<|>>)/s', trim($content), $matches);
-
             $level = 0;
             $sub = '';
             foreach ($matches[0] as $part) {
                 $sub .= $part;
-                $level += (false !== strpos($part, '<<') ? 1 : -1);
+                $level += false !== strpos($part, '<<') ? 1 : -1;
                 if ($level <= 0) {
                     break;
                 }
             }
-
             $offset += strpos($content, '<<') + \strlen(rtrim($sub));
-
             // Removes '<<' and '>>'.
-            $sub = trim((string) preg_replace('/^\s*<<(.*)>>\s*$/s', '\\1', $sub));
-
+            $sub = trim((string) preg_replace('/^\s*<<(.*)>>\s*$/s', '\1', $sub));
             $position = 0;
             $elements = Element::parse($sub, $document, $position);
-
             return new Header($elements, $document);
         }
-
         return false;
     }
 }

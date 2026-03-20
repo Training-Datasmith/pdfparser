@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,23 +30,20 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\X_Object;
 
-namespace Smalot\PdfParser\XObject;
-
-use Smalot\PdfParser\Header;
-use Smalot\PdfParser\Page;
-use Smalot\PdfParser\PDFObject;
-
+use Smalot\Pdf_Parser\Header;
+use Smalot\Pdf_Parser\Page;
+use Smalot\Pdf_Parser\Pdf_Object;
 /**
  * Class Form
  */
 class Form extends Page
 {
-    public function getText(?Page $page = null): string
+    public function get_text(?Page $page = null): string
     {
         $header = new Header([], $this->document);
-        $contents = new PDFObject($this->document, $header, $this->content, $this->config);
-
-        return $contents->getText($this);
+        $contents = new Pdf_Object($this->document, $header, $this->content, $this->config);
+        return $contents->get_text($this);
     }
 }

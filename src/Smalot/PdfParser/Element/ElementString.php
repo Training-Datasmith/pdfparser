@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,23 +30,20 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-use Smalot\PdfParser\Font;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
+use Smalot\Pdf_Parser\Font;
 /**
  * Class ElementString
  */
-class ElementString extends Element
+class Element_String extends Element
 {
     public function equals($value): bool
     {
         return $value == $this->value;
     }
-
     /**
      * @return bool|ElementString
      */
@@ -55,36 +51,28 @@ class ElementString extends Element
     {
         if (preg_match('/^\s*\((?P<name>.*)/s', $content, $match)) {
             $name = $match['name'];
-
             // Find next ')' not escaped.
             $cur_start_text = $start_search_end = 0;
-            while (false !== ($cur_start_pos = strpos($name, ')', $start_search_end))) {
+            while (false !== $cur_start_pos = strpos($name, ')', $start_search_end)) {
                 $cur_extract = substr($name, $cur_start_text, $cur_start_pos - $cur_start_text);
-                preg_match('/(?P<escape>[\\\]*)$/s', $cur_extract, $match);
+                preg_match('/(?P<escape>[\\\\]*)$/s', $cur_extract, $match);
                 if (!(\strlen($match['escape']) % 2)) {
                     break;
                 }
                 $start_search_end = $cur_start_pos + 1;
             }
-
             // Extract string.
             $name = substr($name, 0, (int) $cur_start_pos);
-            $offset += strpos($content, '(') + $cur_start_pos + 2; // 2 for '(' and ')'
-            $name = str_replace(
-                ['\\\\', '\\ ', '\\/', '\(', '\)', '\n', '\r', '\t'],
-                ['\\',   ' ',   '/',   '(',  ')',  "\n", "\r", "\t"],
-                $name
-            );
-
+            $offset += strpos($content, '(') + $cur_start_pos + 2;
+            // 2 for '(' and ')'
+            $name = str_replace(['\\\\', '\ ', '\/', '\(', '\)', '\n', '\r', '\t'], ['\\', ' ', '/', '(', ')', "\n", "\r", "\t"], $name);
             // Decode string.
-            $name = Font::decodeOctal($name);
-            $name = Font::decodeEntities($name);
-            $name = Font::decodeHexadecimal($name, false);
-            $name = Font::decodeUnicode($name);
-
+            $name = Font::decode_octal($name);
+            $name = Font::decode_entities($name);
+            $name = Font::decode_hexadecimal($name, false);
+            $name = Font::decode_unicode($name);
             return new self($name);
         }
-
         return false;
     }
 }

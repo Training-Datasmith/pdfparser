@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,14 +30,12 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser;
 
-namespace Smalot\PdfParser;
-
-use Smalot\PdfParser\Element\ElementArray;
-use Smalot\PdfParser\Element\ElementMissing;
-use Smalot\PdfParser\Element\ElementStruct;
-use Smalot\PdfParser\Element\ElementXRef;
-
+use Smalot\Pdf_Parser\Element\Element_Array;
+use Smalot\Pdf_Parser\Element\Element_Missing;
+use Smalot\Pdf_Parser\Element\Element_Struct;
+use Smalot\Pdf_Parser\Element\Element_X_Ref;
 /**
  * Class Header
  */
@@ -48,12 +45,10 @@ class Header
      * @var Document|null
      */
     protected $document;
-
     /**
      * @var Element[]
      */
     protected $elements;
-
     /**
      * @param Element[] $elements list of elements
      * @param Document  $document document
@@ -63,7 +58,6 @@ class Header
         $this->elements = $elements;
         $this->document = $document;
     }
-
     public function init(): void
     {
         foreach ($this->elements as $element) {
@@ -72,55 +66,46 @@ class Header
             }
         }
     }
-
     /**
      * Returns all elements.
      */
-    public function getElements()
+    public function get_elements()
     {
         foreach ($this->elements as $name => $element) {
-            $this->resolveXRef($name);
+            $this->resolve_x_ref($name);
         }
-
         return $this->elements;
     }
-
     /**
      * Used only for debug.
      */
-    public function getElementTypes(): array
+    public function get_element_types(): array
     {
         $types = [];
-
         foreach ($this->elements as $key => $element) {
             $types[$key] = \get_class($element);
         }
-
         return $types;
     }
-
-    public function getDetails(bool $deep = true): array
+    public function get_details(bool $deep = true): array
     {
         $values = [];
-        $elements = $this->getElements();
-
+        $elements = $this->get_elements();
         foreach ($elements as $key => $element) {
             if ($element instanceof self && $deep) {
-                $values[$key] = $element->getDetails($deep);
-            } elseif ($element instanceof PDFObject && $deep) {
-                $values[$key] = $element->getDetails(false);
-            } elseif ($element instanceof ElementArray) {
+                $values[$key] = $element->get_details($deep);
+            } elseif ($element instanceof Pdf_Object && $deep) {
+                $values[$key] = $element->get_details(false);
+            } elseif ($element instanceof Element_Array) {
                 if ($deep) {
-                    $values[$key] = $element->getDetails();
+                    $values[$key] = $element->get_details();
                 }
             } elseif ($element instanceof Element) {
                 $values[$key] = (string) $element;
             }
         }
-
         return $values;
     }
-
     /**
      * Indicate if an element name is available in header.
      *
@@ -130,19 +115,16 @@ class Header
     {
         return \array_key_exists($name, $this->elements);
     }
-
     /**
      * @return Element|PDFObject
      */
     public function get(string $name)
     {
-        if (\array_key_exists($name, $this->elements) && $element = $this->resolveXRef($name)) {
+        if (\array_key_exists($name, $this->elements) && $element = $this->resolve_x_ref($name)) {
             return $element;
         }
-
-        return new ElementMissing();
+        return new Element_Missing();
     }
-
     /**
      * Resolve XRef to object.
      *
@@ -150,23 +132,19 @@ class Header
      *
      * @throws \Exception
      */
-    protected function resolveXRef(string $name)
+    protected function resolve_x_ref(string $name)
     {
-        if (($obj = $this->elements[$name]) instanceof ElementXRef && null !== $this->document) {
+        if (($obj = $this->elements[$name]) instanceof Element_X_Ref && null !== $this->document) {
             /** @var ElementXRef $obj */
-            $object = $this->document->getObjectById($obj->getId());
-
+            $object = $this->document->get_object_by_id($obj->get_id());
             if (null === $object) {
-                return new ElementMissing();
+                return new Element_Missing();
             }
-
             // Update elements list for future calls.
             $this->elements[$name] = $object;
         }
-
         return $this->elements[$name];
     }
-
     /**
      * @param string   $content  The content to parse
      * @param Document $document The document
@@ -176,20 +154,17 @@ class Header
     {
         /* @var Header $header */
         if ('<<' == substr(trim($content), 0, 2)) {
-            $header = ElementStruct::parse($content, $document, $position);
+            $header = Element_Struct::parse($content, $document, $position);
         } else {
-            $elements = ElementArray::parse($content, $document, $position);
+            $elements = Element_Array::parse($content, $document, $position);
             $header = new self([], $document);
-
             if ($elements) {
-                $header = new self($elements->getRawContent());
+                $header = new self($elements->get_raw_content());
             }
         }
-
         if ($header) {
             return $header;
         }
-
         // Build an empty header.
         return new self([], $document);
     }

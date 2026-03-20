@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,28 +30,24 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-use Smalot\PdfParser\Font;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
+use Smalot\Pdf_Parser\Font;
 /**
  * Class ElementName
  */
-class ElementName extends Element
+class Element_Name extends Element
 {
     public function __construct(string $value)
     {
         parent::__construct($value);
     }
-
     public function equals($value): bool
     {
         return $value == $this->value;
     }
-
     /**
      * @return bool|ElementName
      */
@@ -61,11 +56,9 @@ class ElementName extends Element
         if (preg_match('/^\s*\/([A-Z0-9\-\+,#\.]+)/is', $content, $match)) {
             $name = $match[1];
             $offset += strpos($content, $name) + \strlen($name);
-            $name = Font::decodeEntities($name);
-
+            $name = Font::decode_entities($name);
             return new self($name);
         }
-
         return false;
     }
 }

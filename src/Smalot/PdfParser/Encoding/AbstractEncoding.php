@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Smalot\Pdf_Parser\Encoding;
 
-namespace Smalot\PdfParser\Encoding;
-
-abstract class AbstractEncoding
+abstract class Abstract_Encoding
 {
-    abstract public function getTranslations(): array;
+    abstract public function get_translations(): array;
 }

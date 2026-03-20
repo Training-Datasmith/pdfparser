@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Smalot\Pdf_Parser\Exception;
 
-namespace Smalot\PdfParser\Exception;
-
-class EncodingNotFoundException extends \Exception
+class Encoding_Not_Found_Exception extends \Exception
 {
 }

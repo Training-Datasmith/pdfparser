@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,36 +30,30 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Element;
-
+use Smalot\Pdf_Parser\Element;
 /**
  * Class ElementMissing
  */
-class ElementMissing extends Element
+class Element_Missing extends Element
 {
     public function __construct()
     {
         parent::__construct(null);
     }
-
     public function equals($value): bool
     {
         return false;
     }
-
     public function contains($value): bool
     {
         return false;
     }
-
-    public function getContent(): bool
+    public function get_content(): bool
     {
         return false;
     }
-
     public function __toString(): string
     {
         return '';

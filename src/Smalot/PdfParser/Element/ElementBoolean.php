@@ -1,7 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -31,16 +30,14 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+namespace Smalot\Pdf_Parser\Element;
 
-namespace Smalot\PdfParser\Element;
-
-use Smalot\PdfParser\Document;
-use Smalot\PdfParser\Element;
-
+use Smalot\Pdf_Parser\Document;
+use Smalot\Pdf_Parser\Element;
 /**
  * Class ElementBoolean
  */
-class ElementBoolean extends Element
+class Element_Boolean extends Element
 {
     /**
      * @param string|bool $value
@@ -49,17 +46,14 @@ class ElementBoolean extends Element
     {
         parent::__construct('true' == strtolower($value) || true === $value);
     }
-
     public function __toString(): string
     {
         return $this->value ? 'true' : 'false';
     }
-
     public function equals($value): bool
     {
-        return $this->getContent() === $value;
+        return $this->get_content() === $value;
     }
-
     /**
      * @return bool|ElementBoolean
      */
@@ -68,10 +62,8 @@ class ElementBoolean extends Element
         if (preg_match('/^\s*(?P<value>true|false)/is', $content, $match)) {
             $value = $match['value'];
             $offset += strpos($content, $value) + \strlen($value);
-
             return new self($value);
         }
-
         return false;
     }
 }
