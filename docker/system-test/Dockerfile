@@ -23,7 +23,8 @@ RUN apt-get update \
         php8.2-xml \
         php8.2-zip \
         php8.2-iconv \
-    && rm -rf /var/lib/apt/lists/* \
-    && php -m | grep -qi '^mbstring$' && exit 1 || true
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if php -m | grep -qi '^mbstring$'; then exit 1; fi
 
 WORKDIR /app

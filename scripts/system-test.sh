@@ -33,6 +33,7 @@ run_pass() {
         -w /app \
         -e PASS_LABEL="${label}" \
         -e REQUIRE_MBSTRING="${require_mbstring}" \
+        -e PHPUNIT_EXPECTED_OK_LINE="${PHPUNIT_EXPECTED_OK_LINE:-OK (192 tests, 1181 assertions)}" \
         "${image}" \
         bash -lc '
             set -euo pipefail

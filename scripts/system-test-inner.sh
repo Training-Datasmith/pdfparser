@@ -63,8 +63,12 @@ if [[ ${pin_status} -ne 0 ]]; then
     rm -f "${pin_out}"
     exit "${pin_status}"
 fi
-if ! grep -Fq 'check-cluster-pins: wrong-SHA demo rejected bad reference as expected.' "${pin_out}"; then
-    echo "check-cluster-pins: missing wrong-SHA demo success line (${PASS_LABEL})" >&2
+if ! grep -Fq 'check-cluster-pins: installed.php wrong-SHA demo rejected bad reference as expected.' "${pin_out}"; then
+    echo "check-cluster-pins: missing installed.php wrong-SHA demo success line (${PASS_LABEL})" >&2
+    exit 1
+fi
+if ! grep -Fq 'check-cluster-pins: installed.json wrong-SHA demo rejected bad source.reference as expected.' "${pin_out}"; then
+    echo "check-cluster-pins: missing installed.json wrong-SHA demo success line (${PASS_LABEL})" >&2
     exit 1
 fi
 if ! grep -Fq 'check-cluster-pins: all cluster packages match expected SHAs and aliases.' "${pin_out}"; then
@@ -106,12 +110,15 @@ rm -f "${devtools_out}"
 phpunit_out="$(mktemp)"
 set +e
 if [[ "${REQUIRE_MBSTRING}" == "0" ]]; then
-    php scripts/check-cluster-pins.php
-    php -d max_execution_time=300 scripts/phpunit-polyfill.php --colors=never >"${phpunit_out}" 2>&1
+    {
+        php scripts/check-cluster-pins.php
+        php -d max_execution_time=300 scripts/phpunit-polyfill.php --colors=never
+    } >"${phpunit_out}" 2>&1
+    phpunit_status=$?
 else
     make run-phpunit ARGS="--colors=never" >"${phpunit_out}" 2>&1
+    phpunit_status=$?
 fi
-phpunit_status=$?
 set -e
 cat "${phpunit_out}"
 fail_deprecation_output "phpunit (${PASS_LABEL})" "${phpunit_out}"
@@ -123,12 +130,16 @@ if [[ ${phpunit_status} -ne 0 ]]; then
     rm -f "${phpunit_out}"
     exit "${phpunit_status}"
 fi
-if ! grep -E '^OK \([0-9]+ tests?, [0-9]+ assertions\)$' "${phpunit_out}" >/dev/null; then
-    echo "phpunit: missing strict OK success line (${PASS_LABEL})" >&2
+EXPECTED_OK_LINE="${PHPUNIT_EXPECTED_OK_LINE:-}"
+if [[ -z "${EXPECTED_OK_LINE}" ]]; then
+    echo "phpunit: PHPUNIT_EXPECTED_OK_LINE is not set (${PASS_LABEL})" >&2
     exit 1
 fi
-OK_LINE="$(grep -E '^OK \([0-9]+ tests?, [0-9]+ assertions\)$' "${phpunit_out}" | tail -n 1)"
-echo "Pass ${PASS_LABEL} strict success line: ${OK_LINE}"
+if ! grep -Fxq "${EXPECTED_OK_LINE}" "${phpunit_out}"; then
+    echo "phpunit: missing exact OK success line (${PASS_LABEL}); expected ${EXPECTED_OK_LINE}" >&2
+    exit 1
+fi
+echo "Pass ${PASS_LABEL} strict success line: ${EXPECTED_OK_LINE}"
 rm -f "${phpunit_out}"
 
 echo "Pass ${PASS_LABEL}: all steps passed."

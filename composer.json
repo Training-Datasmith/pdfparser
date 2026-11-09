@@ -34,14 +34,14 @@
         "ext-iconv": "*"
     },
     "autoload": {
-        "psr-0": {
-            "Smalot\\PdfParser\\": "src/"
+        "psr-4": {
+            "Smalot\\PdfParser\\": "src/Smalot/PdfParser/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PerformanceTests\\": "tests/Performance/",
-            "PHPUnitTests\\": "tests/PHPUnit/"
+            "Performance_Tests\\": "tests/Performance/",
+            "PHP_Unit_Tests\\": "tests/PHPUnit/"
         }
     },
     "config": {
