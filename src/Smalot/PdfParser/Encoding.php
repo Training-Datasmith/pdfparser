@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -30,56 +29,68 @@ declare (strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
-namespace Smalot\Pdf_Parser;
 
-use Smalot\Pdf_Parser\Element\Element_Numeric;
-use Smalot\Pdf_Parser\Encoding\Encoding_Locator;
-use Smalot\Pdf_Parser\Encoding\Post_Script_Glyphs;
-use Smalot\Pdf_Parser\Exception\Encoding_Not_Found_Exception;
+namespace Smalot\PdfParser;
+
+use Smalot\PdfParser\Element\ElementNumeric;
+use Smalot\PdfParser\Encoding\EncodingLocator;
+use Smalot\PdfParser\Encoding\PostScriptGlyphs;
+use Smalot\PdfParser\Exception\EncodingNotFoundException;
+
 /**
  * Class Encoding
  */
-class Encoding extends Pdf_Object
+class Encoding extends PDFObject
 {
     /**
      * @var array
      */
     protected $encoding;
+
     /**
      * @var array
      */
     protected $differences;
+
     /**
      * @var array
      */
     protected $mapping;
-    public function init(): void
+
+    public function init()
     {
         $this->mapping = [];
         $this->differences = [];
         $this->encoding = [];
+
         if ($this->has('BaseEncoding')) {
-            $this->encoding = Encoding_Locator::get_encoding($this->get_encoding_class())->get_translations();
+            $this->encoding = EncodingLocator::getEncoding($this->getEncodingClass())->getTranslations();
+
             // Build table including differences.
-            $differences = $this->get('Differences')->get_content();
+            $differences = $this->get('Differences')->getContent();
             $code = 0;
+
             if (!\is_array($differences)) {
                 return;
             }
+
             foreach ($differences as $difference) {
                 /** @var ElementNumeric $difference */
-                if ($difference instanceof Element_Numeric) {
-                    $code = $difference->get_content();
+                if ($difference instanceof ElementNumeric) {
+                    $code = $difference->getContent();
                     continue;
                 }
+
                 // ElementName
                 $this->differences[$code] = $difference;
                 if (\is_object($difference)) {
-                    $this->differences[$code] = $difference->get_content();
+                    $this->differences[$code] = $difference->getContent();
                 }
+
                 // For the next char.
                 ++$code;
             }
+
             $this->mapping = $this->encoding;
             foreach ($this->differences as $code => $difference) {
                 /* @var string $difference */
@@ -87,20 +98,28 @@ class Encoding extends Pdf_Object
             }
         }
     }
-    public function get_details(bool $deep = true): array
+
+    public function getDetails(bool $deep = true): array
     {
         $details = [];
-        $details['BaseEncoding'] = $this->has('BaseEncoding') ? (string) $this->get('BaseEncoding') : 'Ansi';
-        $details['Differences'] = $this->has('Differences') ? (string) $this->get('Differences') : '';
-        return $details + parent::get_details($deep);
+
+        $details['BaseEncoding'] = ($this->has('BaseEncoding') ? (string) $this->get('BaseEncoding') : 'Ansi');
+        $details['Differences'] = ($this->has('Differences') ? (string) $this->get('Differences') : '');
+
+        $details += parent::getDetails($deep);
+
+        return $details;
     }
-    public function translate_char($dec): ?int
+
+    public function translateChar($dec): ?int
     {
         if (isset($this->mapping[$dec])) {
             $dec = $this->mapping[$dec];
         }
-        return Post_Script_Glyphs::get_code_point($dec);
+
+        return PostScriptGlyphs::getCodePoint($dec);
     }
+
     /**
      * Returns encoding class name if available or empty string (only prior PHP 7.4).
      *
@@ -109,7 +128,7 @@ class Encoding extends Pdf_Object
     public function __toString(): string
     {
         try {
-            return $this->get_encoding_class();
+            return $this->getEncodingClass();
         } catch (\Exception $e) {
             // prior to PHP 7.4 toString has to return an empty string.
             if (version_compare(\PHP_VERSION, '7.4.0', '<')) {
@@ -118,21 +137,26 @@ class Encoding extends Pdf_Object
             throw $e;
         }
     }
+
     /**
      * @throws EncodingNotFoundException
      */
-    protected function get_encoding_class(): string
+    protected function getEncodingClass(): string
     {
         // Load reference table charset.
-        $base_encoding = preg_replace('/[^A-Z0-9]/is', '', $this->get('BaseEncoding')->get_content());
+        $baseEncoding = preg_replace('/[^A-Z0-9]/is', '', $this->get('BaseEncoding')->getContent());
+
         // Check for empty BaseEncoding field value
-        if (!\is_string($base_encoding) || 0 == \strlen($base_encoding)) {
-            $base_encoding = 'StandardEncoding';
+        if (!\is_string($baseEncoding) || 0 == \strlen($baseEncoding)) {
+            $baseEncoding = 'StandardEncoding';
         }
-        $class_name = '\Smalot\PdfParser\Encoding\\' . $base_encoding;
-        if (!class_exists($class_name)) {
-            throw new Encoding_Not_Found_Exception('Missing encoding data for: "' . $base_encoding . '".');
+
+        $className = '\\Smalot\\PdfParser\\Encoding\\'.$baseEncoding;
+
+        if (!class_exists($className)) {
+            throw new EncodingNotFoundException('Missing encoding data for: "'.$baseEncoding.'".');
         }
-        return $class_name;
+
+        return $className;
     }
 }

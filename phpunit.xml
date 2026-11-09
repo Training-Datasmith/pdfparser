@@ -2,6 +2,7 @@
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" backupGlobals="false" bootstrap="vendor/autoload.php" colors="true" processIsolation="false" stopOnFailure="false" cacheDirectory=".phpunit.cache" backupStaticProperties="false" displayDetailsOnTestsThatTriggerWarnings="true">
   <php>
+    <ini name="memory_limit" value="1G"/>
     <ini name="error_reporting" value="-1"/>
     <ini name="zend.enable_gc" value="0"/>
     <ini name="error_reporting" value="-1"/>

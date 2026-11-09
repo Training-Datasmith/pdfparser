@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /**
  * @file
  *          This file is part of the PdfParser library.
@@ -30,18 +29,20 @@ declare (strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
-namespace Smalot\Pdf_Parser;
 
-use Smalot\Pdf_Parser\Element\Element_Array;
-use Smalot\Pdf_Parser\Element\Element_Boolean;
-use Smalot\Pdf_Parser\Element\Element_Date;
-use Smalot\Pdf_Parser\Element\Element_Hexa;
-use Smalot\Pdf_Parser\Element\Element_Name;
-use Smalot\Pdf_Parser\Element\Element_Null;
-use Smalot\Pdf_Parser\Element\Element_Numeric;
-use Smalot\Pdf_Parser\Element\Element_String;
-use Smalot\Pdf_Parser\Element\Element_Struct;
-use Smalot\Pdf_Parser\Element\Element_X_Ref;
+namespace Smalot\PdfParser;
+
+use Smalot\PdfParser\Element\ElementArray;
+use Smalot\PdfParser\Element\ElementBoolean;
+use Smalot\PdfParser\Element\ElementDate;
+use Smalot\PdfParser\Element\ElementHexa;
+use Smalot\PdfParser\Element\ElementName;
+use Smalot\PdfParser\Element\ElementNull;
+use Smalot\PdfParser\Element\ElementNumeric;
+use Smalot\PdfParser\Element\ElementString;
+use Smalot\PdfParser\Element\ElementStruct;
+use Smalot\PdfParser\Element\ElementXRef;
+
 /**
  * Class Element
  */
@@ -51,19 +52,24 @@ class Element
      * @var Document|null
      */
     protected $document;
+
     protected $value;
+
     public function __construct($value, ?Document $document = null)
     {
         $this->value = $value;
         $this->document = $document;
     }
+
     public function init()
     {
     }
+
     public function equals($value): bool
     {
         return $value == $this->value;
     }
+
     public function contains($value): bool
     {
         if (\is_array($this->value)) {
@@ -73,36 +79,44 @@ class Element
                     return true;
                 }
             }
+
             return false;
         }
+
         return $this->equals($value);
     }
-    public function get_content()
+
+    public function getContent()
     {
         return $this->value;
     }
+
     public function __toString(): string
     {
         return (string) $this->value;
     }
-    /**
-     * @return mixed[]
-     */
-    public static function parse(string $content, ?Document $document = null, int &$position = 0): array
+
+    public static function parse(string $content, ?Document $document = null, int &$position = 0)
     {
         $args = \func_get_args();
-        $only_values = $args[3] ?? false;
+        $only_values = isset($args[3]) ? $args[3] : false;
         $content = trim($content);
         $values = [];
+
         do {
             $old_position = $position;
+
             if (!$only_values) {
                 if (!preg_match('/\G\s*(?P<name>\/[A-Z#0-9\._]+)(?P<value>.*)/si', $content, $match, 0, $position)) {
                     break;
                 } else {
-                    $name = preg_replace_callback('/#([0-9a-f]{2})/i', function ($m): string {
-                        return \chr(base_convert($m[1], 16, 10));
-                    }, ltrim($match['name'], '/'));
+                    $name = preg_replace_callback(
+                        '/#([0-9a-f]{2})/i',
+                        function ($m) {
+                            return \chr(base_convert($m[1], 16, 10));
+                        },
+                        ltrim($match['name'], '/')
+                    );
                     $value = $match['value'];
                     $position = strpos($content, $value, $position + \strlen($match['name']));
                 }
@@ -110,31 +124,33 @@ class Element
                 $name = \count($values);
                 $value = substr($content, $position);
             }
-            if ($element = Element_Name::parse($value, $document, $position)) {
+
+            if ($element = ElementName::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_X_Ref::parse($value, $document, $position)) {
+            } elseif ($element = ElementXRef::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Numeric::parse($value, $document, $position)) {
+            } elseif ($element = ElementNumeric::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Struct::parse($value, $document, $position)) {
+            } elseif ($element = ElementStruct::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Boolean::parse($value, $document, $position)) {
+            } elseif ($element = ElementBoolean::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Null::parse($value, $document, $position)) {
+            } elseif ($element = ElementNull::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Date::parse($value, $document, $position)) {
+            } elseif ($element = ElementDate::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_String::parse($value, $document, $position)) {
+            } elseif ($element = ElementString::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Hexa::parse($value, $document, $position)) {
+            } elseif ($element = ElementHexa::parse($value, $document, $position)) {
                 $values[$name] = $element;
-            } elseif ($element = Element_Array::parse($value, $document, $position)) {
+            } elseif ($element = ElementArray::parse($value, $document, $position)) {
                 $values[$name] = $element;
             } else {
                 $position = $old_position;
                 break;
             }
         } while ($position < \strlen($content));
+
         return $values;
     }
 }

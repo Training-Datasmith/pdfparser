@@ -8,4 +8,5 @@ run-phpstan:
 	dev-tools/vendor/bin/phpstan analyze $(ARGS)
 
 run-phpunit:
-	dev-tools/vendor/bin/phpunit $(ARGS)
+	php scripts/check-cluster-pins.php
+	php -d max_execution_time=300 dev-tools/vendor/bin/phpunit $(ARGS)

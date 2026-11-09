@@ -20,9 +20,16 @@
         "issues": "https://github.com/smalot/pdfparser/issues"
     },
     "homepage": "https://www.pdfparser.org",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://raw.githubusercontent.com/Training-Datasmith/composer-index/remote-test-2026-11-09",
+            "canonical": false
+        }
+    ],
     "require": {
         "php": ">=7.1",
-        "symfony/polyfill-mbstring": "^1.18",
+        "symfony/polyfill-mbstring": "dev-remote-test-2026-10-07 as 1.33.0",
         "ext-zlib": "*",
         "ext-iconv": "*"
     },
@@ -33,11 +40,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Performance_Tests\\": "tests/Performance/",
-            "PHP_Unit_Tests\\": "tests/PHPUnit/"
+            "PerformanceTests\\": "tests/Performance/",
+            "PHPUnitTests\\": "tests/PHPUnit/"
         }
     },
     "config": {
         "process-timeout": 1200
+    },
+    "scripts": {
+        "check-cluster-pins": "@php scripts/check-cluster-pins.php"
     }
 }
