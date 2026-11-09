@@ -26,4 +26,4 @@ jobs:
         run: "composer update"
 
       - name: "Run performance tests"
-        run: "php tests/Performance/runPerformanceTests.php"
+        run: "php tests/Performance/run_Performance_Tests.php"

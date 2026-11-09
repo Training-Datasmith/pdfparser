@@ -107,14 +107,36 @@ if [[ ${devtools_status} -ne 0 ]]; then
 fi
 rm -f "${devtools_out}"
 
+alt_out="$(mktemp)"
+set +e
+php tests/AltAutoloading/Alt_Autoload_Check.php >"${alt_out}" 2>&1
+alt_status=$?
+set -e
+cat "${alt_out}"
+fail_deprecation_output "alt-autoload-check (${PASS_LABEL})" "${alt_out}"
+if [[ ${alt_status} -ne 0 ]]; then
+    rm -f "${alt_out}"
+    exit "${alt_status}"
+fi
+if ! grep -Fxq 'alt-autoload-check: OK' "${alt_out}"; then
+    echo "alt-autoload-check: missing exact success line (${PASS_LABEL})" >&2
+    rm -f "${alt_out}"
+    exit 1
+fi
+rm -f "${alt_out}"
+
 phpunit_out="$(mktemp)"
+pin_status=0
 set +e
 if [[ "${REQUIRE_MBSTRING}" == "0" ]]; then
-    {
-        php scripts/check-cluster-pins.php
-        php -d max_execution_time=300 scripts/phpunit-polyfill.php --colors=never
-    } >"${phpunit_out}" 2>&1
-    phpunit_status=$?
+    php scripts/check-cluster-pins.php >"${phpunit_out}" 2>&1
+    pin_status=$?
+    if [[ ${pin_status} -eq 0 ]]; then
+        php -d max_execution_time=300 scripts/phpunit-polyfill.php --colors=never >>"${phpunit_out}" 2>&1
+        phpunit_status=$?
+    else
+        phpunit_status=0
+    fi
 else
     make run-phpunit ARGS="--colors=never" >"${phpunit_out}" 2>&1
     phpunit_status=$?
@@ -122,6 +144,11 @@ fi
 set -e
 cat "${phpunit_out}"
 fail_deprecation_output "phpunit (${PASS_LABEL})" "${phpunit_out}"
+if [[ "${REQUIRE_MBSTRING}" == "0" && ${pin_status} -ne 0 ]]; then
+    echo "Pass ${PASS_LABEL}: check-cluster-pins failed during polyfill PHPUnit step (exit ${pin_status})." >&2
+    rm -f "${phpunit_out}"
+    exit "${pin_status}"
+fi
 if [[ ${phpunit_status} -ne 0 ]]; then
     if [[ "${REQUIRE_MBSTRING}" == "0" ]]; then
         echo "Pass ${PASS_LABEL}: PHPUnit failed with polyfill path (no ext-mbstring)." >&2

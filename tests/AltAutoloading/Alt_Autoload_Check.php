@@ -30,6 +30,15 @@ declare(strict_types=1);
  *  along with this program.
  *  If not, see <http://www.pdfparser.org/sites/default/LICENSE.txt>.
  */
+if (!extension_loaded('mbstring')) {
+    $vendor_autoload = __DIR__.'/../../vendor/autoload.php';
+    if (!is_readable($vendor_autoload)) {
+        fwrite(STDERR, "alt-autoload-check: vendor/autoload.php is required when ext-mbstring is not loaded (polyfill bootstrap).\n");
+        exit(1);
+    }
+    require $vendor_autoload;
+}
+
 require __DIR__.'/../../alt_autoload.php-dist';
 
 $parser = new Smalot\PdfParser\Parser();
@@ -38,8 +47,9 @@ $filename = __DIR__.'/../../samples/InternationalChars.pdf';
 $document = $parser->parse_file($filename);
 
 $needle = 'Лорем ипсум долор сит амет, еу сед либрис долорем инцоррупте.';
-if (0 !== strpos($document->get_text(), $needle)) {
-    return 0;
+if (false === strpos($document->get_text(), $needle)) {
+    throw new \Exception('Something went wrong. Alt-Autoload is not working.');
 }
 
-throw new Exception('Something went wrong. Alt-Autoload is not working.');
+fwrite(STDOUT, "alt-autoload-check: OK\n");
+exit(0);

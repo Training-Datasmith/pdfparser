@@ -11,25 +11,25 @@ use Smalot\PdfParser\Config;
 $parser = new Parser();
 
 // Replace with a real PDF path to test
-// $pdf = $parser->parseFile('/path/to/document.pdf');
+// $pdf = $parser->parse_file('/path/to/document.pdf');
 
 // For demonstration, parse from a string (a valid minimal PDF):
-// $pdf = $parser->parseContent(file_get_contents('/path/to/document.pdf'));
+// $pdf = $parser->parse_content(file_get_contents('/path/to/document.pdf'));
 
 echo "// To extract text from a PDF file:\n";
 echo <<<'EXAMPLE'
 $parser = new \Smalot\PdfParser\Parser();
-$pdf    = $parser->parseFile('/path/to/document.pdf');
+$pdf    = $parser->parse_file('/path/to/document.pdf');
 
 // Extract all text from the document
-$text = $pdf->getText();
+$text = $pdf->get_text();
 echo $text;
 
 // Extract text page by page
-$pages = $pdf->getPages();
+$pages = $pdf->get_pages();
 foreach ($pages as $i => $page) {
     echo "=== Page " . ($i + 1) . " ===\n";
-    echo $page->getText();
+    echo $page->get_text();
     echo "\n";
 }
 EXAMPLE;
@@ -38,8 +38,8 @@ echo "\n\n";
 // --- Example 2: Extract metadata ---
 echo "// To extract document metadata:\n";
 echo <<<'EXAMPLE'
-$pdf    = $parser->parseFile('/path/to/document.pdf');
-$details = $pdf->getDetails();
+$pdf    = $parser->parse_file('/path/to/document.pdf');
+$details = $pdf->get_details();
 
 echo "Title:    " . ($details['Title'] ?? 'n/a') . "\n";
 echo "Author:   " . ($details['Author'] ?? 'n/a') . "\n";
@@ -52,10 +52,10 @@ echo "\n\n";
 echo "// Custom config to tune text extraction:\n";
 echo <<<'EXAMPLE'
 $config = new \Smalot\PdfParser\Config();
-$config->setHorizontalOffset(0);  // merge characters with no horizontal gap
+$config->set_horizontal_offset('0');  // merge characters with no horizontal gap
 
 $parser = new \Smalot\PdfParser\Parser([], $config);
-$pdf    = $parser->parseFile('/path/to/document.pdf');
-echo $pdf->getText();
+$pdf    = $parser->parse_file('/path/to/document.pdf');
+echo $pdf->get_text();
 EXAMPLE;
 echo "\n";

@@ -5,9 +5,9 @@ First create a parser object and point it to a file.
 ```php
 $parser = new \Smalot\PdfParser\Parser();
 
-$pdf = $parser->parseFile('document.pdf');
+$pdf = $parser->parse_file('document.pdf');
 // .. or ...
-$pdf = $parser->parseContent(file_get_contents('document.pdf'))
+$pdf = $parser->parse_content(file_get_contents('document.pdf'))
  ```
 
 ## Extract text
@@ -16,13 +16,13 @@ A common scenario is to extract text.
 
 ```php
 // extract text of the whole PDF
-$text = $pdf->getText();
+$text = $pdf->get_text();
 
 // or extract the text of a specific page (in this case the first page)
-$text = $pdf->getPages()[0]->getText();
+$text = $pdf->get_pages()[0]->get_text();
 
 // you can also extract text of a limited amount of pages. here, it will only use the first five pages.
-$text = $pdf->getText(5);
+$text = $pdf->get_text(5);
 ```
 
 ## Extract text positions
@@ -30,7 +30,7 @@ $text = $pdf->getText(5);
 You can extract transformation matrix (indexes 0-3) and x,y position of text objects (indexes 4,5).
 
 ```php
-$data = $pdf->getPages()[0]->getDataTm();
+$data = $pdf->get_pages()[0]->get_data_tm();
 
 Array
 (
@@ -66,18 +66,18 @@ Array
 )
 ```
 
-When activated via Config setting (`Config::setDataTmFontInfoHasToBeIncluded(true)`) font identifier (index 2) and font size (index 3) are added to dataTm.
+When activated via Config setting (`Config::set_data_tm_font_info_has_to_be_included(true)`) font identifier (index 2) and font size (index 3) are added to dataTm.
 
 ```php
 // create config
 $config = new Smalot\PdfParser\Config();
-$config->setDataTmFontInfoHasToBeIncluded(true);
+$config->set_data_tm_font_info_has_to_be_included(true);
 
 // use config and parse file
 $parser = new Smalot\PdfParser\Parser([], $config);
-$pdf = $parser->parseFile('document.pdf');
-$firstpage = $pdf->getPages()[0];
-$data = $firstpage->getDataTm();
+$pdf = $parser->parse_file('document.pdf');
+$firstpage = $pdf->get_pages()[0];
+$data = $firstpage->get_data_tm();
 
 Array
 (
@@ -122,9 +122,9 @@ In next example we are using data from above.
 
 ```php
 $font_id = $data[0][2]; //R7
-$font = $firstpage->getFont($font_id);
+$font = $firstpage->get_font($font_id);
 $text = $data[0][1];
-$width = $font->calculateTextWidth($text, $missing);
+$width = $font->calculate_text_width($text, $missing);
 ```
 
 ## Extract metadata
@@ -132,7 +132,7 @@ $width = $font->calculateTextWidth($text, $missing);
 You can also extract metadata. The available data varies from PDF to PDF.
 
 ```php
-$metaData = $pdf->getDetails();
+$metaData = $pdf->get_details();
 
 Array
 (
@@ -143,7 +143,7 @@ Array
 )
 ```
 
-If the PDF contains Extensible Metadata Platform (XMP) XML metadata, their values, including the XMP namespace, will be appended to the data returned by `getDetails()`. You can read more about what values and namespaces are commonly used in the [XMP Specifications](https://github.com/adobe/XMP-Toolkit-SDK/tree/main/docs).
+If the PDF contains Extensible Metadata Platform (XMP) XML metadata, their values, including the XMP namespace, will be appended to the data returned by `get_details()`. You can read more about what values and namespaces are commonly used in the [XMP Specifications](https://github.com/adobe/XMP-Toolkit-SDK/tree/main/docs).
 
 ```php
 Array
@@ -191,9 +191,9 @@ This sample will parse the Base64 encoded PDF and extract text from each page.
 <?php
 // Parse Base64 encoded PDF string and build necessary objects.
 $parser = new \Smalot\PdfParser\Parser();
-$pdf = $parser->parseContent(base64_decode($base64PDF));
+$pdf = $parser->parse_content(base64_decode($base64PDF));
 
-$text = $pdf->getText();
+$text = $pdf->get_text();
 echo $text;
 ```
 
@@ -204,12 +204,12 @@ Characters without width are added to `$missing` array in second parameter.
 
 ```php
 $parser = new \Smalot\PdfParser\Parser();
-$pdf = $parser->parseFile('document.pdf');
-$fonts = $pdf->getFonts();
+$pdf = $parser->parse_file('document.pdf');
+$fonts = $pdf->get_fonts();
 // get first font (we assume here there is at least one)
 $font = reset($fonts);
 // get width
-$width = $font->calculateTextWidth('Some text', $missing);
+$width = $font->calculate_text_width('Some text', $missing);
 ```
 
 ## Get pages width and height
@@ -218,16 +218,16 @@ Ref: [#472](https://github.com/smalot/pdfparser/issues/427#issuecomment-97341678
 
 ```php
 $parser = new \Smalot\PdfParser\Parser();
-$pdf = $parser->parseFile('document.pdf');
-$pages = $pdf->getPages();
+$pdf = $parser->parse_file('document.pdf');
+$pages = $pdf->get_pages();
 // this variable will contain the height and width of each page of the given PDF
 $mediaBox = [];
 foreach ($pages as $page) {
-    $details = $page->getDetails();
+    $details = $page->get_details();
     // If Mediabox is not set in details of current $page instance, get details from the header instead
     if (!isset($details['MediaBox'])) {
-        $pages = $pdf->getObjectsByType('Pages');
-        $details = reset($pages)->getHeader()->getDetails();
+        $pages = $pdf->get_objects_by_type('Pages');
+        $details = reset($pages)->get_header()->get_details();
     }
     $mediaBox[] = [
         'width' => $details['MediaBox'][2],

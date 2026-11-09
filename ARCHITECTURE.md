@@ -31,7 +31,7 @@ src/Smalot/PdfParser/
 
 ## Key Design Decisions
 
-- **Two-pass parsing**: `RawDataParser` first extracts the binary structure (object offsets, xref tables), then `Parser` builds the semantic object graph
+- **Two-pass parsing**: `Raw_Data_Parser` first extracts the binary structure (object offsets, xref tables), then `Parser` builds the semantic object graph
 - **Lazy stream decoding**: Stream content is decoded only when accessed, avoiding decompressing the entire PDF upfront
 - **Font-aware text extraction**: Each page maps character codes through its font's encoding table, handling multi-byte CID fonts and custom ToUnicode CMaps
 - **Config-driven whitespace**: `Config` controls thresholds for merging or splitting text fragments, allowing tuning for different PDF layouts
@@ -44,10 +44,10 @@ src/Smalot/PdfParser/
 ## Dependency Flow
 
 ```
-Parser::parseFile($path) / parseContent($data)
-  → RawDataParser::parse()       — binary structure, cross-reference
+Parser::parse_file($path) / parse_content($data)
+  → Raw_Data_Parser::parse_data() — binary structure, cross-reference
   → Document (object graph)
-  → Document::getPages()
-  → Page::getText()
-      → Font::decodeText()       — encoding + ToUnicode mapping
+  → Document::get_pages()
+  → Page::get_text()
+      → Font::decode_content()   — encoding + ToUnicode mapping
 ```

@@ -46,9 +46,9 @@ In case you can't use Composer, you can include `alt_autoload.php-dist`. It will
 
 // Parse PDF file and build necessary objects.
 $parser = new \Smalot\PdfParser\Parser();
-$pdf = $parser->parseFile('/path/to/document.pdf');
+$pdf = $parser->parse_file('/path/to/document.pdf');
 
-$text = $pdf->getText();
+$text = $pdf->get_text();
 echo $text;
 ```
 
